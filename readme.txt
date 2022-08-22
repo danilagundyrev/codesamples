@@ -1,3 +1,4 @@
+Project 1.
 One of the features of the App is designed to execute users' commands via voice control.
 
 YandexSpeechKit.cs:
@@ -14,4 +15,10 @@ A base class for handling VideoPlayer events. OnYandexRespond() receives a resul
 and does some stuff according to that analysis.
 
 VPProducts.cs:
-One of the derived classes with specific functionality. 
+One of the derived classes with specific functionality.
+
+Project 2.
+One of the game tools precalculates projectile's velocity and trajectory.
+
+ProjectileTrajectoryPredictor.cs
+This script has methods for precomputing projectile trajectory with a given start velocity vector or for calculating start projectile velocity to hit given target
