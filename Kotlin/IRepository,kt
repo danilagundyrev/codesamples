@@ -1,0 +1,30 @@
+package com.projectnametemplate.app.data
+
+import androidx.lifecycle.LiveData
+
+/**
+ * Interface for a repository - component responsible for mediation of data between multiple sources.
+ */
+interface IRepository {
+    /// PROFESSION ///
+    fun observeProfessions(): LiveData<Result<List<Profession>>>
+    suspend fun getProfessions(): Result<List<Profession>>
+    suspend fun fetchProfessions()
+    suspend fun deleteProfessions()
+    fun observeProfession(id: Int): LiveData<Result<Profession>>
+    suspend fun getProfession(id: Int): Result<Profession>
+    suspend fun fetchProfession(id: Int)
+    suspend fun updateProfession(profession: Profession)
+    suspend fun deleteProfession(id: Int)
+
+    /// PROFILE ///
+    fun observeProfiles(): LiveData<Result<List<Profile>>>
+    suspend fun getProfiles(): Result<List<Profile>>
+    suspend fun fetchProfiles()
+    suspend fun deleteProfiles()
+    fun observeProfile(id: Int): LiveData<Result<Profile>>
+    suspend fun getProfile(id: Int): Result<Profile>
+
+    /// COMMON ///
+    suspend fun deleteAllData()
+}
