@@ -32,7 +32,7 @@ public class VPBase : MonoBehaviour
         //process the received string from Yandex Cloud Service
         int temp = PhraseAnalysis.GetPhraseAnalysis(phrase);
 
-        if (temp != -2) //empty string or string's length is less than 2 symbols
+        if (temp == -2) //empty string or string's length is less than 2 symbols
         {
           return;
         }
