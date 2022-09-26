@@ -26,6 +26,11 @@ public class VPBase : MonoBehaviour
     //Yandex Result Handler reference
     public YSKResultHandler YSKResult;
 
+    protected virtual void Awake()
+    {
+        _vp = GetComponent<VideoPlayer>();
+        _waitingVCsLength = VideoPlayersHandler.instance.WaitingVCs.Length;
+    }
 
     public void OnYandexRespond(string phrase) //Invoke this method from YSKResultHandler
     {
@@ -54,13 +59,13 @@ public class VPBase : MonoBehaviour
         DiactivateListenToUser.Invoke();
     }
     
-    public virtual void ResetParametersBase()
+    protected virtual void ResetParametersBase()
     {
         _currentCounter = 0;
         isWaiting = false;
     }
     
-    public void PlayWaitClip()
+    protected void PlayWaitClip()
     {
         //Set waiting clips
         _vp.clip = VideoPlayersHandler.instance.WaitingVCs[Random.Range(0, _waitingVCsLength)];
