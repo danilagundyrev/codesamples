@@ -8,13 +8,13 @@ public class VPProducts : VPBase
     private int _offerVCsLength;
     private Offer _currentOffer;
 
-    private void Awake()
+    protected override void Awake()
     {
-        _vp = GetComponent<VideoPlayer>();
-        _waitingVCsLength = VideoPlayersHandler.instance.WaitingVCs.Length;
+        base.Awake()
         _offerVCsLength = VideoPlayersHandler.instance.OfferProductsVCs.Length;
     }
-    public void OnVideoPlayedEvent(VideoPlayer vp)
+    
+    private void OnVideoPlayedEvent(VideoPlayer vp)
     {
         _currentCounter++;
         if (_currentCounter <= WaitingClipsToExit)
@@ -60,7 +60,7 @@ public class VPProducts : VPBase
     {
         if (phrase.Contains("YES"))
         {
-            ResetParameters();
+            ResetParametersBase();
             DiactivateListenToUser.Invoke();
 
             //Play offered video
@@ -72,13 +72,13 @@ public class VPProducts : VPBase
         
         if (phrase.Contains("NO"))
         {
-            ResetParameters();
+            ResetParametersBase();
             DiactivateListenToUser.Invoke();
             ExitToMainMenu.Invoke();
         }
     }
     
-    public void PlayOfferClip()
+    private void PlayOfferClip()
     {
         //Set offer clips
         _currentOffer = VideoPlayersHandler.instance.Offers[Random.Range(0, _offerVCsLength)];
@@ -93,7 +93,7 @@ public class VPProducts : VPBase
         _vp.loopPointReached += OnVideoPlayedEvent;
 
         //set basic parameters to their initial values
-        ResetParameters();
+        ResetParametersBase();
 
         //set initial VC and play
         _vp.clip = VideoPlayersHandler.instance.ProductsVC;
