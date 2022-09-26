@@ -74,7 +74,7 @@ public static class TrajectoryPredictor
     /// <returns></returns>
     private static List<Vector3> GetPredictedPoints(Vector3 startPosition, Vector3 velocity, Vector3 angularVelocity, Settings settings, ref Trajectory.BouncePoint bouncePoint)
     {
-        //Initializing Zdenal's magic slowing effect>
+        //Initializing speed multiplier for a slowing effect
         float _speedMultiplier = CalculateInitialSpeedMultiplier(startPosition);
 
         //Setting up initial parameters and variables
