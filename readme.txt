@@ -4,6 +4,9 @@ This folder contains a script which simulates a trajectory of a projectile accor
 KOTLIN FOLDER
 Inside this folder you can find a reduced version of a Repository connected with Local and Remote Databases developed for the personal android app (only a Profile and Profession objects represented there)
 
+UNITY MEDIA PLAYER ENGINE FOLDER
+Contains a script that represents an engine for handling a media player that runs video replays.
+
 UNITY VOICE ASSISTANT FOLDER
 One of the core features of the developed App is designed to execute users' commands via voice control.
 
