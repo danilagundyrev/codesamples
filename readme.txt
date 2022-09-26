@@ -1,3 +1,5 @@
+Kotlin folder
+Inside this folder you can find a reduced version of a Repository connected with Local and Remote Databases developed for the personal android app (only a Profile and Profession objects represented there)
 Project 1.
 One of the features of the App is designed to execute users' commands via voice control.
 
