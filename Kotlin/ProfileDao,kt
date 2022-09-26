@@ -1,0 +1,32 @@
+package com.projectnametemplate.app.data.local
+
+import androidx.room.*
+import com.projectnametemplate.app.data.Profile
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface ProfileDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(profile: Profile)
+
+    @Update
+    suspend fun update(profile: Profile)
+
+    @Query("DELETE FROM profile WHERE user = :id")
+    suspend fun delete(id: Int)
+
+    @Query("DELETE FROM profile")
+    suspend fun deleteAll()
+
+    @Query("SELECT * from profile WHERE user = :id")
+    fun observe(id: Int): Flow<Profile>
+
+    @Query("SELECT * from profile ORDER BY user ASC")
+    fun observeAll(): Flow<List<Profile>>
+
+    @Query("SELECT * from profile WHERE user = :id")
+    fun get(id: Int): Profile?
+
+    @Query("SELECT * from profile ORDER BY user ASC")
+    fun getAll(): List<Profile>
+}
