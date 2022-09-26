@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Video;
 
-public class VPProducts : VPBasic
+public class VPProducts : VPBase
 {
     //Specific counters and parameters for the current state tracking
     private bool isOfferPlayed = false;
