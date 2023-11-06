@@ -1,6 +1,12 @@
 UNITY PROJECTILE PHYSICS FOLDER
 This folder contains a script which simulates a trajectory of a projectile according to the laws of physics. One of the methods calculates an initial velocity vector considering the physic forces such as air resistance force.Another method precomputes and returns a list of the trajectory points with a given timestep and an initial velocity vector.
 
+InAppPurchases FOLDER
+The implementation of in-app purchases for Oculus Quest 2. Includes a management script that handles API interactions with Oculus' in-app purchase system, along with a UI script that governs the on-screen behavior.
+
+META AVATARS FOLDER
+The implementation of the Meta Avatars SDK enables users to view themselves as their unique avatars within the game, enriching the multiplayer experience.
+
 KOTLIN FOLDER
 Inside this folder you can find a reduced version of a Repository connected with Local and Remote Databases developed for the personal android app (only a Profile and Profession objects represented there)
 
