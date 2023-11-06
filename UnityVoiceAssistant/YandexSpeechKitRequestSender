@@ -1,0 +1,50 @@
+public class YandexSpeechKitRequestSender : MonoBehaviour
+{
+    [SerializeField] private string apiToken = "apiTokenValue";
+    [SerializeField] private string folderID = "folderIDValue";
+    private string _receivedText;
+
+    public YSKResultHandler YSKResult;
+
+    public async void LaunchYSK()
+    {
+        string url = $"https://stt.api.cloud.yandex.net/speech/v1/stt:recognize?lang=ru-RU&folderId={folderID}&format=lpcm&sampleRateHertz=8000";
+        string audiopath = Path.Combine(Application.dataPath, "StreamingAssets/Audio/testrecord.wav");
+        
+        try
+        {
+            _receivedText = await PostRequest(url, audiopath);
+            YSKResult.OnResultRecievedFromServer(_receivedText.ToUpper());
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error sending request: {e.Message}");
+        }
+    }
+
+    private async Task<string> PostRequest(string url, string filepath)
+    {
+        using (var httpClient = new HttpClient())
+        using (var content = new MultipartFormDataContent())
+        using (var fileStream = new FileStream(filepath, FileMode.Open, FileAccess.Read))
+        {
+            content.Add(new StreamContent(fileStream), "attachment", Path.GetFileName(filepath));
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Api-Key", apiToken);
+
+            var response = await httpClient.PostAsync(url, content);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Error: {response.StatusCode} - {response.ReasonPhrase}");
+            }
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            return ProcessReceivedText(jsonResponse);
+        }
+    }
+
+    private string ProcessReceivedText(string text)
+    {
+        var response = JsonUtility.FromJson<YSKResponse>(text);
+        return response?.result ?? string.Empty;
+    }
+}
