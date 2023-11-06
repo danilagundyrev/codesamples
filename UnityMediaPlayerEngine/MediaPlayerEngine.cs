@@ -1,14 +1,8 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using UnityEngine;
-using RenderHeads.Media.AVProVideo;
-using Networking;
 public class MediaPlayerEngine : MonoBehaviour
 {
     private const float _frameRate = 50f; 
     private const string _saveFileName = "replays.save";
+    
     private string _saveFilePath;
     
     private MediaPlayer _videoPlayer;
@@ -27,9 +21,11 @@ public class MediaPlayerEngine : MonoBehaviour
         if (Instance != null)
         {
             Debug.LogWarning("More than one MediaPlayerEngine instance has been found!");
+            Destroy(gameObject);
+            return;
         }
         Instance = this;
-        
+
         _saveFilePath = GetSaveFilePath();
         _replayController = GetComponent<VideoReplayController>();
         _videoPlayer = GetComponent<MediaPlayer>();
@@ -42,15 +38,15 @@ public class MediaPlayerEngine : MonoBehaviour
     
     private void Update()
     {
-        //Rewind
-        if (OVRInput.Get(OVRInput.RawButton.RThumbstickUp))
-        {
-            RewindControl(Player.Instance.RightHand, Direction4.Up);
-        }
-        if (OVRInput.Get(OVRInput.RawButton.RThumbstickDown))
-        {
-            RewindControl(Player.Instance.RightHand, Direction4.Down);
-        }
+        HandleInput();
+    }
+    #endregion
+
+    #region MediaPlayerControl
+
+    private void HandleInput()
+    {
+        // Rewind
         if (OVRInput.GetDown(OVRInput.RawButton.RThumbstickLeft))
         {
             RewindControl(Player.Instance.RightHand, Direction4.Left);
@@ -60,22 +56,18 @@ public class MediaPlayerEngine : MonoBehaviour
             RewindControl(Player.Instance.RightHand, Direction4.Right);
         }
         
-        //Play and Pause a video
+        // Play and Pause a video
         if (OVRInput.GetDown(OVRInput.RawButton.B))
         {
             PlayPauseControl();
         }
 
-        //Custom controller button press event
+        // Custom controller button press event
         if (OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.RTouch))
         {
             OnTriggerPress();
         }
     }
-    #endregion
-
-    #region MediaPlayerControl
-    
     private void Play()
     {
         _videoPlayer.Play();
@@ -83,7 +75,7 @@ public class MediaPlayerEngine : MonoBehaviour
 
     private void Pause()
     {
-        VP.Pause();
+        _videoPlayer.Pause();
     }
 
     private void RewindControl(PlayerHand hand, Direction4 direction)
@@ -92,12 +84,6 @@ public class MediaPlayerEngine : MonoBehaviour
 
         switch (direction)
         {
-            case Direction4.Up:
-                handlingMethod = OnJoystickUp;
-                break;
-            case Direction4.Down:
-                handlingMethod = OnJoystickDown;
-                break;
             case Direction4.Left:
                 handlingMethod = OnJoystickLeft;
                 break;
@@ -116,52 +102,49 @@ public class MediaPlayerEngine : MonoBehaviour
     {
         if (ActionHold != null && ActionHold.GetInvocationList().Length > 0)
         {
-            ActionHold(Player.Instance.RightHand);
+            ActionHold.Invoke();
         }
     }
 
     private void OnJoystickLeft()
     {
-        if (!VP.Control.IsPaused())
+        if (!_videoPlayer.Control.IsPaused())
         {
-            VP.Pause();
+            Pause();
         }
 
-        if (VP.Control.GetCurrentTime() != 0)
+        if (_videoPlayer.Control.GetCurrentTime() != 0)
         {
-            VP.Control.Seek(VP.Control.GetCurrentTime() - 1f / _frameRate);
+            _videoPlayer.Control.Seek(_videoPlayer.Control.GetCurrentTime() - 1f / _frameRate);
         }
     }
 
     private void OnJoystickRight()
     {
-        if (!VP.Control.IsPaused())
+        if (!_videoPlayer.Control.IsPaused())
         {
-            VP.Pause();
+            Pause();
         }
 
-        if (VP.Control.GetCurrentTime() != VP.Info.GetDuration())
+        if (_videoPlayer.Control.GetCurrentTime() != _videoPlayer.Info.GetDuration())
         {
-            VP.Control.Seek(VP.Control.GetCurrentTime() + 1f / _frameRate);
+            _videoPlayer.Control.Seek(_videoPlayer.Control.GetCurrentTime() + 1f / _frameRate);
         }
     }
     
-    public void PlayPauseControl()
+    private void PlayPauseControl()
     {
-        if (!_videoPlayer.Control.IsFinished())
+        if (_videoPlayer.Control.IsFinished())
         {
-            if (_videoPlayer.Control.IsPlaying())
-            {
-                Pause();
-            }
-            else
-            {
-                Play();
-            }
+            _videoPlayer.Rewind(false);
+        }
+        else if (_videoPlayer.Control.IsPlaying())
+        {
+            Pause();
         }
         else
         {
-            _videoPlayer.Rewind(false);
+            Play();
         }
     }
     #endregion
@@ -175,7 +158,7 @@ public class MediaPlayerEngine : MonoBehaviour
         return replaysIdPath;
     }
     
-    private string GetSaveFilePath()
+    private static string GetSaveFilePath()
     {
         string finalPath = Path.Combine(GetCurrentReplayFolder(), _saveFileName);
         return finalPath;
@@ -197,7 +180,7 @@ public class MediaPlayerEngine : MonoBehaviour
             _replay = new VideoReplay(true);
             try
             {
-                _replayTool = JsonLoader.Load<VideoReplayTool>(_saveFilePath)
+                _replayTool = JsonLoader.Load<VideoReplayTool>(_saveFilePath);
                 foreach (VideoReplay replay in _replayTool.ReplaysToProcess)
                 {
                     foreach (VideoReplayObject replayObject in replay.Replays)
@@ -226,16 +209,16 @@ public class MediaPlayerEngine : MonoBehaviour
     /// <summary>
     /// Searches through all available replays and returns a list of the chosen replay objects
     /// </summary>
-    /// <param name="replay">Replay you want to get all available replay objects from</param>
+    /// <param name="replayName">Replay you want to get all available replay objects from</param>
     /// <returns>List of all replay objects for a chosen replay</returns>
-    public List<VideoReplayObject> GetReplayObjects(string replay)
+    public List<VideoReplayObject> GetReplayObjects(string replayName)
     {
         List<VideoReplayObject> replayObjects = new List<VideoReplayObject>();
         foreach (VideoReplay replay in _replayTool.ReplaysToProcess)
         {
-            foreach (VideoreplayObject replayObject in replay.Replays)
+            foreach (VideoReplayObject replayObject in replay.Replays)
             {
-                if (replayObject.fileName.Contains(replay))
+                if (replayObject.fileName.Contains(replayName))
                 {
                     replayObjects.Add(replayObject);
                 }
